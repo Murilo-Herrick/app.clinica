@@ -1,5 +1,6 @@
 package com.medpro.medpro.model.entity;
 
+import com.medpro.medpro.model.dto.DadosAtualizacaoMedico;
 import com.medpro.medpro.model.dto.DadosCadastroMedico;
 import com.medpro.medpro.model.enums.Especialidade;
 
@@ -38,6 +39,8 @@ public class Medico {
 
     private String crm;
 
+    private Boolean ativo;
+
     @Enumerated(EnumType.STRING)
     private Especialidade especialidade;
 
@@ -49,8 +52,32 @@ public class Medico {
         this.email = dados.email();
         this.telefone = dados.telefone();
         this.crm = dados.crm();
+        this.ativo = true;
         this.especialidade = dados.especialidade();
         this.endereco = new Endereco(dados.endereco());
     }
 
+    public void atualizarInformacoes(DadosAtualizacaoMedico dados) {
+        if (dados.nome() != null) {
+            if (dados.nome().isBlank()) {
+                throw new IllegalArgumentException("Nome não pode estar em branco.");
+            }
+            this.nome = dados.nome();
+        }
+
+        if (dados.telefone() != null) {
+            if (dados.telefone().isBlank()) {
+                throw new IllegalArgumentException("Telefone não pode estar em branco.");
+            }
+            this.telefone = dados.telefone();
+        }
+
+        if (dados.endereco() != null) {
+            this.endereco.atualizarInformacoes(dados.endereco());
+        }
+    }
+
+    public void excluir() {
+        this.ativo = false;
+    }
 }
