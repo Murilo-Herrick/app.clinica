@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     alignSelf: 'left', // Centraliza a imagem horizontalmente
     marginBottom: 1, // Espaçamento entre o logo e o header
   },
-  header: { fontSize: 12, textAlign: 'left', fontWeight:'bold' },
+  header: { fontSize: 20, textAlign: 'left', fontWeight:'bold' },
   btns : {marginTop:60, flex:1}
 });
 

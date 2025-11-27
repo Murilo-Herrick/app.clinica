@@ -1,17 +1,25 @@
 import React from 'react';
-import MedicoForm from '../../components/MedicoForm'; // Ajuste o caminho
 import { View } from 'react-native';
+import FormularioMedico from '../../components/FormularioMedico';
 
-const CadastroEdicaoMedicoScreen = ({ route, navigation }) => {
-  // A prop 'medico' virá via route.params
-  const { medico } = route.params || {};
+const CadastroEdicaoMedicoScreen = ({ route, navigation, medicos, setMedicos }) => {
+  const medico = route?.params?.medico ?? null;
 
-  const handleSave = (novoDadosMedico) => {
-    // Aqui é onde você faria a chamada de API ou atualizaria o estado global
-    console.log('Dados a serem salvos/editados:', novoDadosMedico);
-    
-    // Supondo que você use uma função de contexto ou Redux para atualizar o estado
-    // Aqui, apenas chamamos o goBack() após o alerta no MedicoForm.js
+  const handleSubmit = (dados, isEditing) => {
+    if (isEditing && medico) {
+      // Atualiza médico existente
+      setMedicos((prev) =>
+        prev.map((m) => (m.id === medico.id ? { ...m, ...dados } : m))
+      );
+    } else {
+      // Cria novo médico
+      const novoId =
+        medicos.length > 0 ? Math.max(...medicos.map((m) => m.id)) + 1 : 1;
+
+      setMedicos((prev) => [...prev, { ...dados, id: novoId }]);
+    }
+
+    navigation.goBack();
   };
 
   const handleCancel = () => {
@@ -20,11 +28,10 @@ const CadastroEdicaoMedicoScreen = ({ route, navigation }) => {
 
   return (
     <View style={{ flex: 1 }}>
-      <MedicoForm
-        medico={medico} // Passa o objeto médico (ou undefined/null)
-        onSave={handleSave}
+      <FormularioMedico
+        medico={medico}
+        onSubmit={handleSubmit}
         onCancel={handleCancel}
-        navigation={navigation}
       />
     </View>
   );
