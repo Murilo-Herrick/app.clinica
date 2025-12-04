@@ -1,19 +1,19 @@
-// src/screens/Medico/CadastroEdicaoMedicoScreen.js
+// src/screens/Paciente/CadastroEdicaoPacienteScreen.js
 import React from "react";
 import { View, Alert } from "react-native";
-import FormularioMedico from "../../components/FormularioMedico";
+import FormularioPaciente from "../../components/FormularioPaciente";
 import {
-  cadastrarMedico,
-  atualizarMedico,
-} from "../../services/medicoService";
+  cadastrarPaciente,
+  atualizarPaciente,
+} from "../../services/pacienteService";
 
-const CadastroEdicaoMedicoScreen = ({
+const CadastroEdicaoPacienteScreen = ({
   route,
   navigation,
-  medicos,
-  setMedicos,
+  pacientes,
+  setPacientes,
 }) => {
-  const medico = route?.params?.medico ?? null;
+  const paciente = route?.params?.paciente ?? null;
 
   const handleSubmit = async (formData, isEditing) => {
     try {
@@ -21,8 +21,7 @@ const CadastroEdicaoMedicoScreen = ({
         nome: formData.nome,
         email: formData.email,
         telefone: formData.telefone,
-        crm: formData.crm,
-        especialidade: formData.especialidade, // já vem no formato do enum
+        cpf: formData.cpf,
         endereco: {
           logradouro: formData.logradouro,
           bairro: formData.bairro,
@@ -34,19 +33,18 @@ const CadastroEdicaoMedicoScreen = ({
         },
       };
 
-      if (isEditing && medico?.id) {
-        const response = await atualizarMedico({
-          id: medico.id,
+      if (isEditing && paciente?.id) {
+        const response = await atualizarPaciente({
+          id: paciente.id,
           ...payloadBase,
         });
 
-        // Atualiza lista local
-        setMedicos((lista) =>
-          lista.map((m) => (m.id === response.id ? response : m))
+        setPacientes((lista) =>
+          lista.map((p) => (p.id === response.id ? response : p))
         );
       } else {
-        const response = await cadastrarMedico(payloadBase);
-        setMedicos((lista) => [...lista, response]);
+        const response = await cadastrarPaciente(payloadBase);
+        setPacientes((lista) => [...lista, response]);
       }
 
       navigation.goBack();
@@ -54,7 +52,7 @@ const CadastroEdicaoMedicoScreen = ({
       console.error(error);
       Alert.alert(
         "Erro",
-        "Não foi possível salvar o médico. Verifique os dados e tente novamente."
+        "Não foi possível salvar o paciente. Verifique os dados e tente novamente."
       );
     }
   };
@@ -65,8 +63,8 @@ const CadastroEdicaoMedicoScreen = ({
 
   return (
     <View style={{ flex: 1 }}>
-      <FormularioMedico
-        medico={medico}
+      <FormularioPaciente
+        paciente={paciente}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
       />
@@ -74,4 +72,4 @@ const CadastroEdicaoMedicoScreen = ({
   );
 };
 
-export default CadastroEdicaoMedicoScreen;
+export default CadastroEdicaoPacienteScreen;

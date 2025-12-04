@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +32,7 @@ public class MedicoController {
     @Autowired
     private MedicoRepository medicoRepository;
 
+    @CrossOrigin(origins = "*")
     @PostMapping
     @Transactional
     public ResponseEntity<DadosDetalhamentoMedico> cadastrar(@RequestBody @Valid DadosCadastroMedico dados,
@@ -41,12 +43,14 @@ public class MedicoController {
         return ResponseEntity.created(uri).body(new DadosDetalhamentoMedico(medico));
     }
 
+    @CrossOrigin(origins = "*")
     @GetMapping
     public ResponseEntity<Page<DadosListagemMedicos>> listar(Pageable paginacao) {
         return ResponseEntity.ok(medicoRepository.findAllByAtivoTrue(paginacao)
                 .map(DadosListagemMedicos::new));
     }
 
+    @CrossOrigin(origins = "*")
     @SuppressWarnings("null")
     @PutMapping
     @Transactional
@@ -56,6 +60,7 @@ public class MedicoController {
         return ResponseEntity.ok(new DadosDetalhamentoMedico(medico));
     }
 
+    @CrossOrigin(origins = "*")
     @SuppressWarnings("null")
     @DeleteMapping("/{id}")
     @Transactional
@@ -65,6 +70,7 @@ public class MedicoController {
         return ResponseEntity.noContent().build();
     }
 
+    @CrossOrigin(origins = "*")
     @SuppressWarnings("null")
     @GetMapping("/{id}")
     @Transactional

@@ -1,4 +1,4 @@
-// src/screens/Medico/MedicosListScreen.js
+// src/screens/Paciente/PacientesListScreen.js
 import React, { useState, useMemo } from "react";
 import {
   View,
@@ -18,38 +18,38 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import { excluirMedico } from "../../services/medicoService";
+import { excluirPaciente } from "../../services/pacienteService";
 
 const IconeLupa = require("../../../assets/lupa.png");
 const IconeSeta = require("../../../assets/seta.png");
 
-// Habilita LayoutAnimation no Android
+// Habilita animação no Android
 if (Platform.OS === "android") {
   if (UIManager.setLayoutAnimationEnabledExperimental) {
     UIManager.setLayoutAnimationEnabledExperimental(true);
   }
 }
 
-// Agrupa e filtra médicos por letra inicial do nome
-const groupAndFilterMedicos = (medicos, searchText) => {
+// Agrupa/filtra pacientes por letra inicial do nome
+const groupAndFilterPacientes = (pacientes, searchText) => {
   const textoFiltro = searchText.trim().toLowerCase();
 
-  const filtrados = medicos
-    .filter((medico) => {
+  const filtrados = pacientes
+    .filter((paciente) => {
       if (!textoFiltro) return true;
-      const alvo = `${medico.nome ?? ""} ${medico.especialidade ?? ""}`.toLowerCase();
+      const alvo = `${paciente.nome ?? ""} ${paciente.cpf ?? ""}`.toLowerCase();
       return alvo.includes(textoFiltro);
     })
     .sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
 
   const mapa = {};
 
-  filtrados.forEach((medico) => {
-    const primeiraLetra = (medico.nome?.[0] || "#").toUpperCase();
+  filtrados.forEach((paciente) => {
+    const primeiraLetra = (paciente.nome?.[0] || "#").toUpperCase();
     if (!mapa[primeiraLetra]) {
       mapa[primeiraLetra] = [];
     }
-    mapa[primeiraLetra].push(medico);
+    mapa[primeiraLetra].push(paciente);
   });
 
   return Object.keys(mapa)
@@ -60,7 +60,7 @@ const groupAndFilterMedicos = (medicos, searchText) => {
     }));
 };
 
-const MedicoCard = ({ medico, navigation, onDesativar }) => {
+const PacienteCard = ({ paciente, navigation, onExcluir }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleExpand = () => {
@@ -68,14 +68,19 @@ const MedicoCard = ({ medico, navigation, onDesativar }) => {
     setIsExpanded((prev) => !prev);
   };
 
+  const endereco = paciente.endereco || {};
+  const enderecoResumido = endereco.logradouro
+    ? `${endereco.logradouro}, ${endereco.numero || ""} - ${
+        endereco.cidade || ""
+      }/${endereco.uf || ""}`
+    : "Endereço não informado";
+
   return (
     <View style={cardStyles.card}>
       <TouchableOpacity onPress={toggleExpand} style={cardStyles.mainInfo}>
         <View>
-          <Text style={cardStyles.nome}>{medico.nome}</Text>
-          <Text style={cardStyles.especialidade}>
-            {medico.especialidade} | CRM: {medico.crm}
-          </Text>
+          <Text style={cardStyles.nome}>{paciente.nome}</Text>
+          <Text style={cardStyles.cpf}>CPF: {paciente.cpf}</Text>
         </View>
         <Image
           source={IconeSeta}
@@ -88,24 +93,23 @@ const MedicoCard = ({ medico, navigation, onDesativar }) => {
 
       {isExpanded && (
         <View style={cardStyles.details}>
-          <Text style={cardStyles.detailText}>Email: {medico.email}</Text>
-          <Text style={cardStyles.detailText}>Telefone: {medico.telefone}</Text>
-          {/* Se na listagem não vier endereço, isso aqui fica opcional */}
-          {medico.endereco && (
-            <Text style={cardStyles.detailText}>
-              Endereço: {medico.endereco}
-            </Text>
-          )}
+          <Text style={cardStyles.detailText}>Email: {paciente.email}</Text>
+          <Text style={cardStyles.detailText}>
+            Telefone: {paciente.telefone}
+          </Text>
+          <Text style={cardStyles.detailText}>Endereço: {enderecoResumido}</Text>
 
           <View style={cardStyles.actionButtons}>
             <Button
               title="Editar"
-              onPress={() => navigation.navigate("MedicoForm", { medico })}
+              onPress={() =>
+                navigation.navigate("PacienteForm", { paciente })
+              }
             />
             <Button
-              title="Desativar Perfil"
+              title="Excluir"
               color="red"
-              onPress={() => onDesativar(medico.id)}
+              onPress={() => onExcluir(paciente.id)}
             />
           </View>
         </View>
@@ -114,26 +118,26 @@ const MedicoCard = ({ medico, navigation, onDesativar }) => {
   );
 };
 
-const MedicosListScreen = ({ navigation, medicos, setMedicos }) => {
+const PacientesListScreen = ({ navigation, pacientes, setPacientes }) => {
   const [searchText, setSearchText] = useState("");
   const insets = useSafeAreaInsets();
 
-  const handleDesativarMedico = async (id) => {
+  const handleExcluirPaciente = async (id) => {
     try {
-      await excluirMedico(id);
-      setMedicos((prev) => prev.filter((m) => m.id !== id));
+      await excluirPaciente(id);
+      setPacientes((prev) => prev.filter((p) => p.id !== id));
     } catch (error) {
-      console.error("Erro ao desativar médico:", error);
+      console.error("Erro ao excluir paciente:", error);
       Alert.alert(
         "Erro",
-        "Não foi possível desativar esse médico. Tente novamente."
+        "Não foi possível excluir esse paciente. Tente novamente."
       );
     }
   };
 
   const sections = useMemo(
-    () => groupAndFilterMedicos(medicos, searchText),
-    [medicos, searchText]
+    () => groupAndFilterPacientes(pacientes, searchText),
+    [pacientes, searchText]
   );
 
   return (
@@ -145,11 +149,10 @@ const MedicosListScreen = ({ navigation, medicos, setMedicos }) => {
         },
       ]}
     >
-      {/* Campo de busca */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Pesquisar médico ou especialidade"
+          placeholder="Pesquisar paciente ou CPF"
           placeholderTextColor="#999"
           value={searchText}
           onChangeText={setSearchText}
@@ -157,16 +160,15 @@ const MedicosListScreen = ({ navigation, medicos, setMedicos }) => {
         <Image source={IconeLupa} style={styles.searchIcon} />
       </View>
 
-      {/* Lista em ordem alfabética */}
       <View style={styles.listWrapper}>
         <SectionList
           sections={sections}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <MedicoCard
-              medico={item}
+            <PacienteCard
+              paciente={item}
               navigation={navigation}
-              onDesativar={handleDesativarMedico}
+              onExcluir={handleExcluirPaciente}
             />
           )}
           renderSectionHeader={({ section: { title } }) => (
@@ -176,18 +178,17 @@ const MedicosListScreen = ({ navigation, medicos, setMedicos }) => {
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>
-                Nenhum médico encontrado.
+                Nenhum paciente encontrado.
               </Text>
             </View>
           }
         />
       </View>
 
-      {/* Botão flutuante para adicionar novo médico */}
       <View style={styles.fabContainer}>
         <TouchableOpacity
           style={styles.fabButton}
-          onPress={() => navigation.navigate("MedicoForm")}
+          onPress={() => navigation.navigate("PacienteForm")}
         >
           <Text style={styles.fabText}>+</Text>
         </TouchableOpacity>
@@ -296,7 +297,7 @@ const cardStyles = StyleSheet.create({
     fontWeight: "bold",
     color: "#1A202C",
   },
-  especialidade: {
+  cpf: {
     fontSize: 14,
     color: "#4A5568",
     marginTop: 2,
@@ -324,4 +325,4 @@ const cardStyles = StyleSheet.create({
   },
 });
 
-export default MedicosListScreen;
+export default PacientesListScreen;

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,15 +34,22 @@ public class PacienteController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<DadosDetalhamentoPaciente> cadastrar(@RequestBody @Valid DadosCadastroPaciente dados,
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<DadosDetalhamentoPaciente> cadastrar(
+            @RequestBody @Valid DadosCadastroPaciente dados,
             UriComponentsBuilder uriBuilder) {
+
         var paciente = new Paciente(dados);
         pacienteRepository.save(paciente);
-        var uri = uriBuilder.path("/pacientes/{id}").buildAndExpand(paciente.getId()).toUri();
-        pacienteRepository.save(new Paciente(dados));
+
+        var uri = uriBuilder.path("/pacientes/{id}")
+                .buildAndExpand(paciente.getId())
+                .toUri();
+
         return ResponseEntity.created(uri).body(new DadosDetalhamentoPaciente(paciente));
     }
 
+    @CrossOrigin(origins = "*")
     @GetMapping
     public ResponseEntity<Page<DadosListagemPacientes>> listar(Pageable paginacao) {
         return ResponseEntity.ok(pacienteRepository.findAllByAtivoTrue(paginacao)
@@ -59,6 +67,7 @@ public class PacienteController {
 
     @SuppressWarnings("null")
     @DeleteMapping("/{id}")
+    @CrossOrigin(origins = "*")
     @Transactional
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         var paciente = pacienteRepository.getReferenceById(id);
@@ -68,6 +77,7 @@ public class PacienteController {
 
     @SuppressWarnings("null")
     @GetMapping("/{id}")
+    @CrossOrigin(origins = "*")
     @Transactional
     public ResponseEntity<DadosDetalhamentoPaciente> detalhar(@PathVariable Long id) {
         var paciente = pacienteRepository.getReferenceById(id);

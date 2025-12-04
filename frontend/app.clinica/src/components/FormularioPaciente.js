@@ -1,3 +1,4 @@
+// src/components/FormularioPaciente.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -11,35 +12,77 @@ import {
   Platform,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { ESPECIALIDADES_MEDICAS, UFS_BRASIL, MEDICO_MODELO } from "./utils";
 
-const FormularioMedico = ({ medico = null, onCancel, onSubmit }) => {
-  const isEditing = medico !== null;
-  const titulo = isEditing ? "Editar Perfil" : "Novo Perfil";
+const UFS_BRASIL = [
+  "AC",
+  "AL",
+  "AP",
+  "AM",
+  "BA",
+  "CE",
+  "DF",
+  "ES",
+  "GO",
+  "MA",
+  "MT",
+  "MS",
+  "MG",
+  "PA",
+  "PB",
+  "PR",
+  "PE",
+  "PI",
+  "RJ",
+  "RN",
+  "RS",
+  "RO",
+  "RR",
+  "SC",
+  "SP",
+  "SE",
+  "TO",
+];
 
-  const [formData, setFormData] = useState(MEDICO_MODELO);
+const PACIENTE_MODELO = {
+  nome: "",
+  email: "",
+  telefone: "",
+  cpf: "",
+  logradouro: "",
+  numero: "",
+  complemento: "",
+  cidade: "",
+  uf: "SP",
+  bairro: "",
+  cep: "",
+};
+
+const FormularioPaciente = ({ paciente = null, onSubmit, onCancel }) => {
+  const isEditing = paciente !== null;
+  const titulo = isEditing ? "Editar Paciente" : "Novo Paciente";
+
+  const [formData, setFormData] = useState(PACIENTE_MODELO);
 
   useEffect(() => {
-    if (medico) {
-      const end = medico.endereco || {};
+    if (paciente) {
+      const end = paciente.endereco || {};
       setFormData({
-        nome: medico.nome || "",
-        crm: medico.crm || "",
-        especialidade: medico.especialidade || "",
-        email: medico.email || "",
-        telefone: medico.telefone || "",
+        nome: paciente.nome || "",
+        email: paciente.email || "",
+        telefone: paciente.telefone || "",
+        cpf: paciente.cpf || "",
         logradouro: end.logradouro || "",
         numero: end.numero || "",
         complemento: end.complemento || "",
-        bairro: end.bairro || "",
-        cep: end.cep || "",
         cidade: end.cidade || "",
         uf: end.uf || "SP",
+        bairro: end.bairro || "",
+        cep: end.cep || "",
       });
     } else {
-      setFormData(MEDICO_MODELO);
+      setFormData(PACIENTE_MODELO);
     }
-  }, [medico]);
+  }, [paciente]);
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({
@@ -49,16 +92,29 @@ const FormularioMedico = ({ medico = null, onCancel, onSubmit }) => {
   };
 
   const handleSubmit = () => {
-    const especialidadeNaoEscolhida = !formData.especialidade;
-
-    if (!formData.nome || !formData.crm || especialidadeNaoEscolhida) {
-      Alert.alert("Erro", "Preencha Nome, CRM e selecione a Especialidade.");
+    if (!formData.nome || !formData.cpf) {
+      Alert.alert("Erro", "Preencha pelo menos Nome e CPF.");
       return;
     }
 
+    const dados = {
+      nome: formData.nome,
+      email: formData.email,
+      telefone: formData.telefone,
+      cpf: formData.cpf,
+      endereco: {
+        logradouro: formData.logradouro,
+        numero: formData.numero,
+        complemento: formData.complemento,
+        cidade: formData.cidade,
+        uf: formData.uf,
+        bairro: formData.bairro,
+        cep: formData.cep,
+      },
+    };
+
     if (onSubmit) {
-      onSubmit(formData, isEditing);
-      // o sucesso (e navegação) é controlado na tela que chamou
+      onSubmit(dados, isEditing);
     }
   };
 
@@ -69,13 +125,13 @@ const FormularioMedico = ({ medico = null, onCancel, onSubmit }) => {
       keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
     >
       <View style={styles.screen}>
-        {/* Cabeçalho azul */}
+        {/* Cabeçalho igual ao do médico */}
         <View style={styles.headerCard}>
           <Text style={styles.headerTitle}>{titulo}</Text>
           <Text style={styles.headerSubtitle}>
             {isEditing
-              ? "Atualize os dados do profissional"
-              : "Preencha os dados para cadastrar um novo médico"}
+              ? "Atualize os dados do paciente"
+              : "Preencha os dados para cadastrar um novo paciente"}
           </Text>
         </View>
 
@@ -85,11 +141,11 @@ const FormularioMedico = ({ medico = null, onCancel, onSubmit }) => {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {/* -------------------- BLOCO PROFISSIONAL -------------------- */}
+          {/* -------------------- BLOCO DADOS DO PACIENTE -------------------- */}
           <View style={styles.section}>
             <View style={styles.sectionHeaderRow}>
               <View style={styles.sectionAccent} />
-              <Text style={styles.sectionTitle}>Profissional</Text>
+              <Text style={styles.sectionTitle}>Dados do Paciente</Text>
             </View>
 
             <Text style={styles.label}>Nome completo</Text>
@@ -97,48 +153,22 @@ const FormularioMedico = ({ medico = null, onCancel, onSubmit }) => {
               style={styles.input}
               value={formData.nome}
               onChangeText={(text) => handleChange("nome", text)}
-              placeholder="Nome completo do médico"
+              placeholder="Nome completo do paciente"
               placeholderTextColor="#B0B0B0"
             />
 
-            <View style={styles.row}>
-              <View style={[styles.column, { flex: 0.5 }]}>
-                <Text style={styles.label}>CRM</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.crm}
-                  onChangeText={(text) => handleChange("crm", text)}
-                  placeholder="Ex: 12345"
-                  placeholderTextColor="#B0B0B0"
-                  keyboardType="numeric"
-                />
-              </View>
-
-              <View style={[styles.column, { flex: 0.5 }]}>
-                <Text style={styles.label}>Especialidade</Text>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={formData.especialidade}
-                    onValueChange={(value) =>
-                      handleChange("especialidade", value)
-                    }
-                    style={styles.picker}
-                    dropdownIconColor="#007AFF"
-                  >
-                    {ESPECIALIDADES_MEDICAS.map((esp) => (
-                      <Picker.Item
-                        key={esp.value || "placeholder"}
-                        label={esp.label}
-                        value={esp.value}
-                      />
-                    ))}
-                  </Picker>
-                </View>
-              </View>
-            </View>
+            <Text style={styles.label}>CPF</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.cpf}
+              onChangeText={(text) => handleChange("cpf", text)}
+              placeholder="Somente números"
+              placeholderTextColor="#B0B0B0"
+              keyboardType="numeric"
+            />
           </View>
 
-          {/* -------------------- BLOCO: CONTATOS -------------------- */}
+          {/* -------------------- BLOCO CONTATOS -------------------- */}
           <View style={styles.section}>
             <View style={styles.sectionHeaderRow}>
               <View style={styles.sectionAccent} />
@@ -150,7 +180,7 @@ const FormularioMedico = ({ medico = null, onCancel, onSubmit }) => {
               style={styles.input}
               value={formData.email}
               onChangeText={(text) => handleChange("email", text)}
-              placeholder="E-mail profissional"
+              placeholder="E-mail do paciente"
               placeholderTextColor="#B0B0B0"
               keyboardType="email-address"
               autoCapitalize="none"
@@ -167,11 +197,11 @@ const FormularioMedico = ({ medico = null, onCancel, onSubmit }) => {
             />
           </View>
 
-          {/* -------------------- BLOCO ENDEREÇO PROFISSIONAL -------------------- */}
+          {/* -------------------- BLOCO ENDEREÇO -------------------- */}
           <View style={styles.section}>
             <View style={styles.sectionHeaderRow}>
               <View style={styles.sectionAccent} />
-              <Text style={styles.sectionTitle}>Endereço profissional</Text>
+              <Text style={styles.sectionTitle}>Endereço</Text>
             </View>
 
             <Text style={styles.label}>Logradouro</Text>
@@ -202,7 +232,7 @@ const FormularioMedico = ({ medico = null, onCancel, onSubmit }) => {
                   style={styles.input}
                   value={formData.complemento}
                   onChangeText={(text) => handleChange("complemento", text)}
-                  placeholder="Sala, bloco, apto (opcional)"
+                  placeholder="Casa, apto, bloco..."
                   placeholderTextColor="#B0B0B0"
                 />
               </View>
@@ -225,7 +255,9 @@ const FormularioMedico = ({ medico = null, onCancel, onSubmit }) => {
                 <View style={styles.pickerContainer}>
                   <Picker
                     selectedValue={formData.uf}
-                    onValueChange={(value) => handleChange("uf", value)}
+                    onValueChange={(itemValue) =>
+                      handleChange("uf", itemValue)
+                    }
                     style={styles.picker}
                     dropdownIconColor="#007AFF"
                   >
@@ -265,19 +297,13 @@ const FormularioMedico = ({ medico = null, onCancel, onSubmit }) => {
 
           {/* -------------------- BOTÕES DE AÇÃO -------------------- */}
           <View style={styles.actions}>
-            <TouchableOpacity
-              style={styles.primaryButton}
-              onPress={handleSubmit}
-            >
+            <TouchableOpacity style={styles.primaryButton} onPress={handleSubmit}>
               <Text style={styles.primaryButtonText}>
                 {isEditing ? "Concluir edição" : "Concluir cadastro"}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={onCancel}
-            >
+            <TouchableOpacity style={styles.secondaryButton} onPress={onCancel}>
               <Text style={styles.secondaryButtonText}>Cancelar</Text>
             </TouchableOpacity>
           </View>
@@ -287,7 +313,7 @@ const FormularioMedico = ({ medico = null, onCancel, onSubmit }) => {
   );
 };
 
-// --- ESTILOS ---
+// --- ESTILOS (copiados/adaptados do FormularioMedico) ---
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
@@ -411,4 +437,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FormularioMedico;
+export default FormularioPaciente;

@@ -2,16 +2,16 @@
 
 // Lista de especialidades para o Picker
 export const ESPECIALIDADES_MEDICAS = [
-  'Selecione uma especialidade',
-  'Cardiologia',
-  'Pediatria',
-  'Dermatologia',
-  'Ginecologia',
-  'Neurologia',
-  'Clínica Geral',
-  'Ortopedia',
-  'Psiquiatria',
-  'Endocrinologia',
+  { label: 'Selecione uma especialidade', value: '' },
+  { label: 'Cardiologia',       value: 'CARDIOLOGIA' },
+  { label: 'Pediatria',         value: 'PEDIATRIA' },
+  { label: 'Dermatologia',      value: 'DERMATOLOGIA' },
+  { label: 'Ginecologia',       value: 'GINECOLOGIA' },
+  { label: 'Neurologia',        value: 'NEUROLOGIA' },
+  { label: 'Clínica Geral',     value: 'CLINICA_GERAL' },
+  { label: 'Ortopedia',         value: 'ORTOPEDIA' },
+  { label: 'Psiquiatria',       value: 'PSIQUIATRIA' },
+  { label: 'Endocrinologia',    value: 'ENDOCRINOLOGIA' },
 ];
 
 // Lista de UFs do Brasil para o Picker
@@ -26,12 +26,14 @@ export const UFS_BRASIL = [
 export const MEDICO_MODELO = {
   nome: '',
   crm: '',
-  especialidade: ESPECIALIDADES_MEDICAS[0],
+  especialidade: '',     
   email: '',
   telefone: '',
   logradouro: '',
   numero: '',
   complemento: '',
+  bairro: '',            
+  cep: '',                
   cidade: '',
   uf: UFS_BRASIL[0],
 };

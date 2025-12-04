@@ -44,7 +44,7 @@ const MenuScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {flex:1,flexDirection: 'column', 
     justifyContent: 'flex-start', // Começa do topo
-    padding: 20, // Aumentei o padding para dar um respiro lateral e no topo
+    padding: 5, // Aumentei o padding para dar um respiro lateral e no topo
     backgroundColor: '#fff'},
   logo: {
     // Definimos a largura em relação ao contêiner
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     marginBottom: 1, // Espaçamento entre o logo e o header
   },
   header: { fontSize: 20, textAlign: 'left', fontWeight:'bold' },
-  btns : {marginTop:60, flex:1}
+  btns : {marginTop:30, flex:1}
 });
 
 export default MenuScreen;

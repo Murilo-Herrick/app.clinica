@@ -1,5 +1,5 @@
 // App.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
@@ -8,63 +8,47 @@ import Splash from "./src/screens/Splash/Splash";
 import MenuScreen from "./src/screens/Menu/MenuScreen";
 import MedicosListScreen from "./src/screens/Medico/MedicosListScreen";
 import CadastroEdicaoMedicoScreen from "./src/screens/Medico/CadastroEdicaoMedicoScreen";
-import Op2Screen from "./src/screens/Paciente/Paciente.js";
-import Consulta from "./src/screens/Consulta/Consulta.js";
+import PacientesListScreen from "./src/screens/Paciente/PacientesListScreen";
+import CadastroEdicaoPacienteScreen from "./src/screens/Paciente/CadastroEdicaoPacienteScreen";
+import Consulta from "./src/screens/Consulta/Consulta";
+
+// Serviços
+import { listarMedicos } from "./src/services/medicoService";
+import { listarPacientes } from "./src/services/pacienteService";
 
 const Stack = createStackNavigator();
 
 function App() {
-  const [medicos, setMedicos] = useState([
-    {
-      id: 1,
-      nome: "João de Oliveira",
-      especialidade: "Cardiologista",
-      crm: "12345/MG",
-      email: "joao@clinica.com",
-      telefone: "(31) 98765-4321",
-      endereco: "Rua A, 100",
-    },
-    {
-      id: 2,
-      nome: "Antônio de Oliveira",
-      especialidade: "Pediatra",
-      crm: "23456/MG",
-      email: "antonio@clinica.com",
-      telefone: "(31) 99876-5432",
-      endereco: "Av. B, 200",
-    },
-    {
-      id: 3,
-      nome: "Maria da Silva",
-      especialidade: "Dermatologista",
-      crm: "34567/SP",
-      email: "maria@clinica.com",
-      telefone: "(11) 97654-3210",
-      endereco: "Rua C, 300",
-    },
-    {
-      id: 4,
-      nome: "Beatriz Souza",
-      especialidade: "Ginecologista",
-      crm: "45678/RJ",
-      email: "beatriz@clinica.com",
-      telefone: "(21) 96543-2109",
-      endereco: "Av. D, 400",
-    },
-    {
-      id: 5,
-      nome: "Carlos Santos",
-      especialidade: "Neurologista",
-      crm: "56789/BA",
-      email: "carlos@clinica.com",
-      telefone: "(71) 95432-1098",
-      endereco: "Praça E, 500",
-    },
-  ]);
+  const [medicos, setMedicos] = useState([]);
+  const [pacientes, setPacientes] = useState([]);
+
+  useEffect(() => {
+    const carregar = async () => {
+      try {
+        const [listaMedicos, listaPacientes] = await Promise.all([
+          listarMedicos(),
+          listarPacientes(),
+        ]);
+        setMedicos(listaMedicos);
+        setPacientes(listaPacientes);
+      } catch (error) {
+        console.error("Erro ao carregar dados da API:", error);
+      }
+    };
+
+    carregar();
+  }, []);
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Splash">
+      <Stack.Navigator
+        initialRouteName="Splash"
+        screenOptions={{
+          headerStyle: { backgroundColor: "#1A73E8" },
+          headerTintColor: "#fff",
+          headerTitleStyle: { fontWeight: "bold" },
+        }}
+      >
         <Stack.Screen
           name="Splash"
           component={Splash}
@@ -74,11 +58,11 @@ function App() {
         <Stack.Screen
           name="Menu"
           component={MenuScreen}
-          options={{ headerShown: false }}
+          options={{ title: "Menu Principal" }}
         />
 
-        {/* Lista de médicos */}
-        <Stack.Screen name="Medicos">
+        {/* Médicos */}
+        <Stack.Screen name="Medicos" options={{ title: "Médicos" }}>
           {(props) => (
             <MedicosListScreen
               {...props}
@@ -88,11 +72,10 @@ function App() {
           )}
         </Stack.Screen>
 
-        {/* Cadastro / edição de médico */}
         <Stack.Screen
           name="MedicoForm"
           options={({ route }) => ({
-            title: route?.params?.medico ? "Editar Perfil" : "Novo Perfil",
+            title: route?.params?.medico ? "Editar Médico" : "Novo Médico",
           })}
         >
           {(props) => (
@@ -104,12 +87,33 @@ function App() {
           )}
         </Stack.Screen>
 
-        {/* Placeholders pra Pacientes e Consultas */}
+        {/* Pacientes */}
+        <Stack.Screen name="Pacientes" options={{ title: "Pacientes" }}>
+          {(props) => (
+            <PacientesListScreen
+              {...props}
+              pacientes={pacientes}
+              setPacientes={setPacientes}
+            />
+          )}
+        </Stack.Screen>
+
         <Stack.Screen
-          name="Pacientes"
-          component={Op2Screen}
-          options={{ title: "Pacientes" }}
-        />
+          name="PacienteForm"
+          options={({ route }) => ({
+            title: route?.params?.paciente ? "Editar Paciente" : "Novo Paciente",
+          })}
+        >
+          {(props) => (
+            <CadastroEdicaoPacienteScreen
+              {...props}
+              pacientes={pacientes}
+              setPacientes={setPacientes}
+            />
+          )}
+        </Stack.Screen>
+
+        {/* Consultas */}
         <Stack.Screen
           name="Consultas"
           component={Consulta}
