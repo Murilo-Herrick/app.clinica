@@ -48,6 +48,12 @@ A aplicação ficará disponível em:
 http://localhost:8080
 ```
 
+# 🌐 Documentação da API (Swagger)
+
+Após iniciar o backend, a documentação estará disponível em:
+
+👉 http://localhost:8080/swagger-ui/index.html
+
 ---
 
 # Executando o App Mobile / Web (Expo)
