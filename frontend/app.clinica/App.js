@@ -25,14 +25,23 @@ function App() {
   useEffect(() => {
     const carregar = async () => {
       try {
-        const [listaMedicos, listaPacientes] = await Promise.all([
-          listarMedicos(),
-          listarPacientes(),
-        ]);
+        const listaMedicos = await listarMedicos();
         setMedicos(listaMedicos);
+      } catch (error) {
+        console.error(
+          "Erro ao carregar médicos:",
+          error.response?.data || error.message
+        );
+      }
+
+      try {
+        const listaPacientes = await listarPacientes();
         setPacientes(listaPacientes);
       } catch (error) {
-        console.error("Erro ao carregar dados da API:", error);
+        console.error(
+          "Erro ao carregar pacientes:",
+          error.response?.data || error.message
+        );
       }
     };
 
@@ -101,7 +110,9 @@ function App() {
         <Stack.Screen
           name="PacienteForm"
           options={({ route }) => ({
-            title: route?.params?.paciente ? "Editar Paciente" : "Novo Paciente",
+            title: route?.params?.paciente
+              ? "Editar Paciente"
+              : "Novo Paciente",
           })}
         >
           {(props) => (
