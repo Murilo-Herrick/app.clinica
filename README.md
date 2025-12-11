@@ -13,7 +13,7 @@ frontend/app.clinica → Aplicação mobile/web com React Native (Expo)
 
 # Executando o Backend (API Spring Boot)
 
-### Backend utiliza MySQL via Docker Compose
+### Backend utiliza MySQL via Docker Compose, ja inicializando a API junto
 
 ### Passo 1 — Acessar a pasta do backend
 
@@ -35,18 +35,6 @@ Banco | medpro
 User | root  
 Senha | root  
 Porta MySQL local | 3307  
-
-### Passo 3 — Iniciar a API Spring Boot
-
-```bash
-mvn spring-boot:run
-```
-
-A aplicação ficará disponível em:
-
-```
-http://localhost:8080
-```
 
 # 🌐 Documentação da API (Swagger)
 
@@ -124,10 +112,6 @@ frontend/app.clinica/src/services/api.js
 
 ```bash
 docker-compose up -d
-```
-
-```bash
-mvn spring-boot:run
 ```
 
 ```bash
