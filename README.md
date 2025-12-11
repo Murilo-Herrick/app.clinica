@@ -1,3 +1,8 @@
+# Integrantes
+- Murilo Herrick Riva de Camargo
+- Nicolas Moreira Ribeiro
+- Vinicius Brolezzi Gaban
+
 # MedPro — Guia de Execução
 Aplicação Web + Mobile + API REST  
 (Spring Boot + Docker + React Native / Expo)
