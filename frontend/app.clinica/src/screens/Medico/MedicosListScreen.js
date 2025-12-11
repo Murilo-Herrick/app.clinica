@@ -37,7 +37,9 @@ const groupAndFilterMedicos = (medicos, searchText) => {
   const filtrados = medicos
     .filter((medico) => {
       if (!textoFiltro) return true;
-      const alvo = `${medico.nome ?? ""} ${medico.especialidade ?? ""}`.toLowerCase();
+      const alvo = `${medico.nome ?? ""} ${
+        medico.especialidade ?? ""
+      }`.toLowerCase();
       return alvo.includes(textoFiltro);
     })
     .sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
@@ -68,6 +70,13 @@ const MedicoCard = ({ medico, navigation, onDesativar }) => {
     setIsExpanded((prev) => !prev);
   };
 
+  const endereco = medico.endereco || {};
+  const enderecoResumido = endereco.logradouro
+    ? `${endereco.logradouro}, ${endereco.numero || ""} - ${
+        endereco.cidade || ""
+      }/${endereco.uf || ""}`
+    : "Endereço não informado";
+
   return (
     <View style={cardStyles.card}>
       <TouchableOpacity onPress={toggleExpand} style={cardStyles.mainInfo}>
@@ -90,12 +99,11 @@ const MedicoCard = ({ medico, navigation, onDesativar }) => {
         <View style={cardStyles.details}>
           <Text style={cardStyles.detailText}>Email: {medico.email}</Text>
           <Text style={cardStyles.detailText}>Telefone: {medico.telefone}</Text>
-          {/* Se na listagem não vier endereço, isso aqui fica opcional */}
-          {medico.endereco && (
-            <Text style={cardStyles.detailText}>
-              Endereço: {medico.endereco}
-            </Text>
-          )}
+
+          {/* aqui estava o problema */}
+          <Text style={cardStyles.detailText}>
+            Endereço: {enderecoResumido}
+          </Text>
 
           <View style={cardStyles.actionButtons}>
             <Button
@@ -175,9 +183,7 @@ const MedicosListScreen = ({ navigation, medicos, setMedicos }) => {
           contentContainerStyle={styles.sectionContent}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>
-                Nenhum médico encontrado.
-              </Text>
+              <Text style={styles.emptyText}>Nenhum médico encontrado.</Text>
             </View>
           }
         />

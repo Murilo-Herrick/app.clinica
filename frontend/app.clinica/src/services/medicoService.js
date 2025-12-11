@@ -35,3 +35,9 @@ export async function atualizarMedico(dados) {
 export async function excluirMedico(id) {
   await api.delete(`/medicos/${id}`);
 }
+
+export async function detalharMedico(id) {
+  const response = await api.get(`/medicos/${id}`);
+  // backend retorna DadosDetalhamentoMedico (inclui telefone, endereco completo etc)
+  return response.data;
+}

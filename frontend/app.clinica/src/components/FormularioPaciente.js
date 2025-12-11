@@ -97,24 +97,9 @@ const FormularioPaciente = ({ paciente = null, onSubmit, onCancel }) => {
       return;
     }
 
-    const dados = {
-      nome: formData.nome,
-      email: formData.email,
-      telefone: formData.telefone,
-      cpf: formData.cpf,
-      endereco: {
-        logradouro: formData.logradouro,
-        numero: formData.numero,
-        complemento: formData.complemento,
-        cidade: formData.cidade,
-        uf: formData.uf,
-        bairro: formData.bairro,
-        cep: formData.cep,
-      },
-    };
-
+    // Aqui a tela espera o formData PLANO
     if (onSubmit) {
-      onSubmit(dados, isEditing);
+      onSubmit(formData, isEditing);
     }
   };
 
@@ -313,7 +298,7 @@ const FormularioPaciente = ({ paciente = null, onSubmit, onCancel }) => {
   );
 };
 
-// --- ESTILOS (copiados/adaptados do FormularioMedico) ---
+// --- ESTILOS ---
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
