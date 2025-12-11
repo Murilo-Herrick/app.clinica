@@ -1,5 +1,6 @@
 package com.medpro.medpro.model.dto;
 
+import com.medpro.medpro.model.entity.Endereco;
 import com.medpro.medpro.model.entity.Paciente;
 
 public record DadosListagemPacientes(
@@ -7,14 +8,17 @@ public record DadosListagemPacientes(
         String nome,
         String email,
         String telefone,
-        String cpf) {
+        String cpf,
+        Endereco endereco
+) {
     public DadosListagemPacientes(Paciente paciente) {
         this(
             paciente.getId(),
             paciente.getNome(),
             paciente.getEmail(),
             paciente.getTelefone(),
-            paciente.getCpf()
+            paciente.getCpf(),
+            paciente.getEndereco()
         );
     }
 }
