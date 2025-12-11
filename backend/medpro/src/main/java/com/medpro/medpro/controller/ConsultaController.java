@@ -4,12 +4,17 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.medpro.medpro.model.dto.DadosAgendamentoConsulta;
 import com.medpro.medpro.model.dto.DadosCancelamentoConsulta;
 import com.medpro.medpro.model.dto.DadosDetalhamentoConsulta;
 import com.medpro.medpro.model.dto.DadosListagemConsulta;
+import com.medpro.medpro.model.enums.StatusConsulta;
 import com.medpro.medpro.repository.ConsultaRepository;
 import com.medpro.medpro.service.AgendamentoDeConsultasService;
 import com.medpro.medpro.service.CancelamentoDeConsultasService;
@@ -39,7 +44,8 @@ public class ConsultaController {
 
     @GetMapping
     public ResponseEntity<List<DadosListagemConsulta>> listar() {
-        var consultas = consultaRepository.findAll()
+
+        var consultas = consultaRepository.findAllByStatus(StatusConsulta.AGENDADA)
                 .stream()
                 .map(DadosListagemConsulta::new)
                 .toList();
